@@ -32,6 +32,12 @@ class App extends React.Component {
     });
   }
 
+  onClickPage = (k) => {
+    this.setState({
+      clicked: k
+    });
+  }
+
   renderHeader = () => (
     <header className="App-header">
       <div>In progress</div>
@@ -62,13 +68,14 @@ class App extends React.Component {
             }
         </div>
         <div className="scroller">
-          { this.state.uploadedFiles.getFiles().map((value, index) =>
+          { this.state.pageList.groupByFile().map((value, index) =>
               <Preview
-                docId={ index }
-                file={ value.file }
+                pages={ value.pages }
+                file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
+                index={ index }
                 key={ `doc_${ index }` }
               >
-              </Preview> 
+              </Preview>
             )
           }
         </div>
@@ -79,8 +86,9 @@ class App extends React.Component {
 
   render() {
     console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
-    console.log("Files : ", this.state.uploadedFiles.getFiles())
-    console.log("Total number of pages : ", this.state.pageList.getPages().length)
+    console.log("Files : ", this.state.uploadedFiles.getFiles());
+    console.log("Total number of pages : ", this.state.pageList.getLength());
+    console.log("========================")
     return (
       <div className="App">
         { this.renderHeader() }

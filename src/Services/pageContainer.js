@@ -15,10 +15,33 @@ class pageContainer {
         }
     }
 
+    groupByFile (){
+        if (this.getLength() == 0) { return []; }
+        let lastId = null;
+        let grouped = [];
+        let current = [];
+        for (const el of this.container) {
+            if (lastId != null && lastId != el.fileId) {
+                grouped.push({
+                    fileId: lastId,
+                    pages: current.slice()
+                });
+                current = [];
+            }
+            current.push(el.page);
+            lastId = el.fileId;
+        }
+        grouped.push({
+            fileId: lastId,
+            pages: current.slice()
+        });
+        return grouped;
+    }
+
     // Getters
 
-    getPages() {
-        return this.container;
+    getLength() {
+        return this.container.length;
     }
 }
 

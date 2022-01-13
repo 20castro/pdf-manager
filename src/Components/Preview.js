@@ -7,41 +7,31 @@ class Preview extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = {
-        numPages: null
-      }
     }
   
-    renderPages = (n) => {
+    renderPages = (pages) => {
       let items = [];
-      for (let k = 0; k < n; k++){
+      for (let k of pages){
         items.push(
           <Page
-            key={`doc_${ this.props.docId }:page_${ k + 1 }`}
-            pageNumber={ k + 1 }
+            key={`doc_${ this.props.index }:page_${ k }`}
+            pageNumber={ k }
             width={ 200 }
-            onClick={ () => { console.log('Clicked page ', k + 1) }}
+            onClick={ () => { console.log('Clicked page ', k) }}
           />
         );
       }
       return items;
     }
-  
-    onDocumentLoadSuccess = ({ numPages }) => {
-      this.setState({
-        numPages: numPages
-      });
-    }
-  
+    
     render() {
       return (
         <div>
           <Document
             file={ this.props.file }
-            onLoadSuccess={ this.onDocumentLoadSuccess }
             onLoadError={ () => { console.log("Failed to load"); } }
           >
-            { this.renderPages(this.state.numPages) }
+            { this.renderPages(this.props.pages) }
           </Document>
         </div>
       );
