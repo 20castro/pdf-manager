@@ -1,8 +1,7 @@
 import './App.css';
 import React from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-// import axios from 'axios'; or fetch
+import Preview from './Components/Preview';
+import fileContainer from './Services/fileContainer';
 
 /* Test Button */
 
@@ -25,58 +24,14 @@ class Button extends React.Component {
   }
 }
 
-class Preview extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      numPages: null
-    }
-    console.log(props)
-  }
-
-  renderPages = (n) => {
-    let items = [];
-    for (let k = 0; k < n; k++){
-      items.push(
-        <Page
-          key={`doc_${ this.props.docId }:page_${ k + 1 }`}
-          pageNumber={ k + 1 }
-          width={ 200 }
-          onClick={ () => { console.log('Clicked page ', k + 1) }}
-        />
-      );
-    }
-    return items;
-  }
-
-  onDocumentLoadSuccess = ({ numPages }) => {
-    this.setState({
-      numPages: numPages
-    });
-  }
-
-  render() {
-    return (
-      <div>
-        <Document
-          file={ this.props.file }
-          onLoadSuccess={ this.onDocumentLoadSuccess }
-          onLoadError={ () => { console.log("Failed to load"); } }
-        >
-          { this.renderPages(this.state.numPages) }
-        </Document>
-      </div>
-    );
-  }
-}
+/* Test Button */
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      uploadedFiles: []
+      uploadedFiles: new fileContainer()
     };
   }
 
@@ -84,8 +39,14 @@ class App extends React.Component {
     let newFiles = event.target.files;
     console.log("File event : " + newFiles.length + " added");
     this.setState({
-      uploadedFiles: this.state.uploadedFiles.concat(Object.values(newFiles))
+      uploadedFiles: this.state.uploadedFiles.append(newFiles)
     });
+  }
+
+  addNumPages = (n) => {
+    this.setState({
+      uploadedFiles: this.state.uploadedFiles.addPages(n)
+    })
   }
 
   renderHeader = () => (
@@ -110,8 +71,8 @@ class App extends React.Component {
           />
         </div>
         <div className="scroller">
-          { this.state.uploadedFiles.map((value, index) =>
-              <Preview docId={ index } file={ value } key={ `doc_${ index }` }></Preview> 
+          { this.state.uploadedFiles.getFiles().map((value, index) =>
+              <Preview docId={ index } file={ value } key={ `doc_${ index }`} callback={ this.addNumPages }></Preview> 
             )
           }
         </div>
@@ -121,7 +82,8 @@ class App extends React.Component {
   )
 
   render() {
-    console.log("Uploaded ", this.state.uploadedFiles.length, " files in total");
+    console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
+    console.log("Pages : ", this.state.uploadedFiles.getPages())
     return (
       <div className="App">
         { this.renderHeader() }
