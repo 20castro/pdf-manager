@@ -1,37 +1,18 @@
 import './App.css';
 import React from 'react';
 import Preview from './Components/Preview';
+import Queue from './Components/Queue';
 import fileContainer from './Services/fileContainer';
-
-/* Test Button */
-
-class Button extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { clicked: 0 };
-  }
-
-  handleClick = () => {
-    console.log(this.state.clicked)
-    this.setState({ clicked: this.state.clicked + 1 });
-  }
-
-  render() {
-    return (
-      <button onClick={ this.handleClick }>{ this.state.clicked }</button>
-    );
-  }
-}
-
-/* Test Button */
+import pageContainer from './Services/pageContainer';
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      uploadedFiles: new fileContainer()
+      uploadedFiles: new fileContainer(),
+      pageList: new pageContainer(),
+      clicked: null
     };
   }
 
@@ -43,17 +24,17 @@ class App extends React.Component {
     });
   }
 
-  addNumPages = (n) => {
+  addNumPages = (index, n) => {
+    let newFiles = this.state.uploadedFiles.addPages(index, n);
     this.setState({
-      uploadedFiles: this.state.uploadedFiles.addPages(n)
-    })
+      uploadedFiles: newFiles,
+      pageList: newFiles.toPageContainer()
+    });
   }
 
   renderHeader = () => (
     <header className="App-header">
-      <div>
-        <Button></Button>
-      </div>
+      <div>In progress</div>
     </header>
   )
 
@@ -69,10 +50,25 @@ class App extends React.Component {
             multiple
             onChange={ this.onFileChange }
           />
+            { this.state.uploadedFiles.getFiles().map((value, index) =>
+                <Queue
+                  docId={ index }
+                  fileFormat={ value }
+                  key={ `doc_${ index }` }
+                  callback={ this.addNumPages }
+                >
+                </Queue> 
+              )
+            }
         </div>
         <div className="scroller">
           { this.state.uploadedFiles.getFiles().map((value, index) =>
-              <Preview docId={ index } file={ value } key={ `doc_${ index }`} callback={ this.addNumPages }></Preview> 
+              <Preview
+                docId={ index }
+                file={ value.file }
+                key={ `doc_${ index }` }
+              >
+              </Preview> 
             )
           }
         </div>
@@ -83,7 +79,8 @@ class App extends React.Component {
 
   render() {
     console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
-    console.log("Pages : ", this.state.uploadedFiles.getPages())
+    console.log("Files : ", this.state.uploadedFiles.getFiles())
+    console.log("Total number of pages : ", this.state.pageList.getPages().length)
     return (
       <div className="App">
         { this.renderHeader() }

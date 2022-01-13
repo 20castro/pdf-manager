@@ -28,7 +28,6 @@ class Preview extends React.Component {
     }
   
     onDocumentLoadSuccess = ({ numPages }) => {
-      this.props.callback(numPages);
       this.setState({
         numPages: numPages
       });

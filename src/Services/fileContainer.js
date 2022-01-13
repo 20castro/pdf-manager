@@ -1,27 +1,44 @@
+import pageContainer from "./pageContainer";
 
 class fileContainer {
 
     constructor() {
         this.container = [];
-        this.pages = [];
+        this.pages = new pageContainer();
     }
 
     append(newFiles) {
-        this.container = this.container.concat(Object.values(newFiles));
+        let newList = Object.values(newFiles);
+        for (let fileData of newList) {
+            this.container.push({
+                file: fileData,
+                loaded: false,
+                added: false
+            })
+        }
         return this;
     }
 
-    getFiles() {
-        return this.container;
+    addPages(index, n) {
+        this.container[index]['numberPages'] = n;
+        this.container[index].loaded = true;
+        return this;
     }
 
-    getPages() {
+    toPageContainer() {
+        for (let [index, el] of this.container.entries()) {
+            if (el.loaded && !(el.added)) {
+                this.pages.appendEntireFile(index, el.numberPages);
+                this.container[index].added = true;
+            }
+        }
         return this.pages;
     }
 
-    addPages(n) {
-        this.pages.push(n);
-        return this;
+    // Getters
+
+    getFiles() {
+        return this.container;
     }
 }
 
