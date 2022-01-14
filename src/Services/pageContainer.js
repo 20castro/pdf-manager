@@ -43,6 +43,32 @@ class pageContainer {
         return grouped;
     }
 
+    // Pages moves
+
+    find (pid) {
+        for (const [index, value] of this.container.entries()) {
+            if (value.pageId == pid){ return index; }
+        }
+        return -1;
+    }
+
+    goUp (pid) {
+        const loc = this.find(pid);
+        if (loc > 0){
+            // Swaping
+            [this.container[loc - 1], this.container[loc]] = [this.container[loc], this.container[loc - 1]]
+        }
+        return this;
+    }
+
+    goDown (pid) {
+        const loc = this.find(pid);
+        if (loc > -1 && loc < this.container.length - 1){
+            [this.container[loc], this.container[loc + 1]] = [this.container[loc + 1], this.container[loc]]
+        }
+        return this;
+    }
+
     // Getters
 
     getLength() {

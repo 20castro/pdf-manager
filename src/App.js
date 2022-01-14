@@ -1,9 +1,15 @@
 import './App.css';
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowCircleUp, faArrowCircleDown } from '@fortawesome/free-solid-svg-icons'
+
 import Preview from './Components/Preview';
 import Queue from './Components/Queue';
+import Button from './Components/Button';
+
 import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
+
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -44,6 +50,18 @@ class App extends React.Component {
     });
   }
 
+  onClickUp = () => {
+    this.setState({
+      pageList: this.state.pageList.goUp(this.state.clickedId)
+    });
+  }
+
+  onClickDown = () => {
+    this.setState({
+      pageList: this.state.pageList.goDown(this.state.clickedId)
+    });
+  }
+
   renderHeader = () => (
     <header className="App-header">
       <div>In progress</div>
@@ -57,6 +75,10 @@ class App extends React.Component {
     else {
       return (
         <div className="pageviz">
+          <div id="vCenter">
+            <Button callback={ this.onClickUp } img={ faArrowCircleUp }></Button>
+            <Button callback={ this.onClickDown } img={ faArrowCircleDown }></Button>
+          </div>
           <div id="vCenter">
             <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
               <Page
