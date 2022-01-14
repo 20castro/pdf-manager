@@ -22,9 +22,10 @@
 }
 
 .subcontainer {
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
   width: 25%;
-  height: 200px;
+  height: 350px;
 }
 
 .scroller {
@@ -36,8 +37,17 @@
   margin-left: 10px;
   margin-right: 10px;
   width: 75%;
-  height: 200px;
+  height: 400px;
   background-color: #e6eeff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#vCenter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .uploader {

@@ -8,8 +8,10 @@ class pageContainer {
     appendEntireFile(index, n) {
         console.log("Adding file ", index)
         for (let k = 0; k < n; k++) {
+            const l = this.container.length;
             this.container.push({
                 fileId: index,
+                pageId: l,
                 page: k + 1
             });
         }
@@ -28,7 +30,10 @@ class pageContainer {
                 });
                 current = [];
             }
-            current.push(el.page);
+            current.push({
+                num: el.page,
+                id: el.pageId
+            });
             lastId = el.fileId;
         }
         grouped.push({

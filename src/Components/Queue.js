@@ -11,7 +11,6 @@ class Queue extends React.Component {
   
     onDocumentLoadSuccess = ({ numPages }) => {
         this.props.callback(this.props.docId, numPages);
-        console.log("File ", this.props.docId, " successfully loaded");
     }
   
     render() {

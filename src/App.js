@@ -15,7 +15,8 @@ class App extends React.Component {
       uploadedFiles: new fileContainer(),
       pageList: new pageContainer(),
       clickedFile: null,
-      clickedPage: null
+      clickedPage: null,
+      clickedId: null
     };
   }
 
@@ -35,10 +36,11 @@ class App extends React.Component {
     });
   }
 
-  onClickPage = (n, k) => {
+  onClickPage = (n, k, id) => {
     this.setState({
       clickedFile: n,
-      clickedPage: k
+      clickedPage: k,
+      clickedId: id
     });
   }
 
@@ -55,12 +57,14 @@ class App extends React.Component {
     else {
       return (
         <div className="pageviz">
-          <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
-            <Page
-              pageNumber={ this.state.clickedPage }
-              width={ 300 }>
-            </Page>
-          </Document>
+          <div id="vCenter">
+            <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
+              <Page
+                pageNumber={ this.state.clickedPage }
+                width={ 300 }>
+              </Page>
+            </Document>
+          </div>
         </div>
       );
     }
@@ -94,6 +98,7 @@ class App extends React.Component {
               <Preview
                 value={ value }
                 file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
+                clicked={ this.state.clickedId }
                 index={ index }
                 key={ `doc_${ index }` }
                 callback={ this.onClickPage }
@@ -111,7 +116,14 @@ class App extends React.Component {
     console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
-    console.log("Clicked : page ", this.state.clickedPage, " from file ", this.state.clickedFile);
+    console.log(
+      "Clicked page ",
+      this.state.clickedPage,
+      " from file ",
+      this.state.clickedFile,
+      ", id : ",
+      this.state.clickedId
+    );
     console.log("========================")
     return (
       <div className="App">
