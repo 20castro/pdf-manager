@@ -9,15 +9,17 @@ class Preview extends React.Component {
       super(props);
     }
   
-    renderPages = (pages) => {
+    renderPages = () => {
       let items = [];
-      for (let k of pages){
+      for (let k of this.props.value.pages){
         items.push(
           <Page
             key={`doc_${ this.props.index }:page_${ k }`}
             pageNumber={ k }
             width={ 200 }
-            onClick={ () => { console.log('Clicked page ', k) }}
+            onClick={ () => {
+              this.props.callback(this.props.value.fileId, k);
+            }}
           />
         );
       }
@@ -31,7 +33,7 @@ class Preview extends React.Component {
             file={ this.props.file }
             onLoadError={ () => { console.log("Failed to load"); } }
           >
-            { this.renderPages(this.props.pages) }
+            { this.renderPages() }
           </Document>
         </div>
       );

@@ -4,6 +4,8 @@ import Preview from './Components/Preview';
 import Queue from './Components/Queue';
 import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
+import { Document, Page, pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 class App extends React.Component {
 
@@ -12,7 +14,8 @@ class App extends React.Component {
     this.state = {
       uploadedFiles: new fileContainer(),
       pageList: new pageContainer(),
-      clicked: null
+      clickedFile: null,
+      clickedPage: null
     };
   }
 
@@ -32,9 +35,10 @@ class App extends React.Component {
     });
   }
 
-  onClickPage = (k) => {
+  onClickPage = (n, k) => {
     this.setState({
-      clicked: k
+      clickedFile: n,
+      clickedPage: k
     });
   }
 
@@ -43,6 +47,24 @@ class App extends React.Component {
       <div>In progress</div>
     </header>
   )
+
+  renderCentralPage = () => {
+    if (this.state.clickedFile == null || this.state.clickedPage == null) {
+      return <div className="pageviz">PDF page</div>;
+    }
+    else {
+      return (
+        <div className="pageviz">
+          <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
+            <Page
+              pageNumber={ this.state.clickedPage }
+              width={ 300 }>
+            </Page>
+          </Document>
+        </div>
+      );
+    }
+  }
 
   renderScrollbars = () => (
     <div className="container">
@@ -70,17 +92,18 @@ class App extends React.Component {
         <div className="scroller">
           { this.state.pageList.groupByFile().map((value, index) =>
               <Preview
-                pages={ value.pages }
+                value={ value }
                 file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
                 index={ index }
                 key={ `doc_${ index }` }
+                callback={ this.onClickPage }
               >
               </Preview>
             )
           }
         </div>
       </div>
-      <div className="pageviz">PDF page</div>
+      { this.renderCentralPage() }
     </div>
   )
 
@@ -88,6 +111,7 @@ class App extends React.Component {
     console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
+    console.log("Clicked : page ", this.state.clickedPage, " from file ", this.state.clickedFile);
     console.log("========================")
     return (
       <div className="App">
