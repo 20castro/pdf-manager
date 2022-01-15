@@ -2,18 +2,19 @@
 class pageContainer {
 
     constructor() {
-        this.container = [];
+        this.container = []
+        this.cnt = 0;
     }
 
     appendEntireFile(index, n) {
         console.log("Adding file ", index)
         for (let k = 0; k < n; k++) {
-            const l = this.container.length;
             this.container.push({
                 fileId: index,
-                pageId: l,
+                pageId: this.cnt,
                 page: k + 1
             });
+            this.cnt++;
         }
     }
 

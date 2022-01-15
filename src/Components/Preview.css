@@ -3,12 +3,22 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+    margin: 3%;
 }
 
 .clicked {
-    border: solid 1px blue;
+    border: solid 2px #e6eeff;
+    border-radius: 5%;
 }
 
 .unclicked {
     border-radius: 5%;
+}
+
+.react-pdf__Page__canvas {
+    border-radius: 5%;
+}
+
+.react-pdf__Page__annotations {
+    display: none;
 }
