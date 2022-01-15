@@ -12,29 +12,22 @@ class Preview extends React.Component {
     renderPages = () => {
       let items = [];
       for (let p of this.props.value.pages){
-        let page = (
-          <Page
-            pageNumber={ p.num }
-            width={ 200 }
-            onClick={ () => {
-              this.props.callback(this.props.value.fileId, p.num, p.id);
-            }}
-          />
-        );
+        let name = "unclicked";
         if (p.id == this.props.clicked) {
-          items.push(
-            <div id="clicked" key={`id_${ p.id }`}>
-              { page }
-            </div>
-          );
+          name = "clicked";
         }
-        else {
-          items.push(
-            <div id="unclicked" key={`id_${ p.id }`}>
-              { page }
-            </div>
-          );
-        }
+        items.push(
+          <div id="page" key={`id_${ p.id }`}>
+            <Page
+              pageNumber={ p.num }
+              className={ name }
+              width={ 200 }
+              onClick={ () => {
+                this.props.callback(this.props.value.fileId, p.num, p.id);
+              }}
+            />
+          </div>
+        );
       }
       return items;
     }

@@ -1,13 +1,14 @@
 
-#clicked {
-    border: solid 1px blue;
+#page {
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
 
-#unclicked {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+.clicked {
+    border: solid 1px blue;
+}
+
+.unclicked {
+    border-radius: 5%;
 }

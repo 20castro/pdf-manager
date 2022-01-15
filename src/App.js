@@ -1,7 +1,6 @@
 import './App.css';
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowCircleUp, faArrowCircleDown } from '@fortawesome/free-solid-svg-icons'
+import { faArrowCircleUp, faArrowCircleDown, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 import Preview from './Components/Preview';
 import Queue from './Components/Queue';
@@ -62,6 +61,17 @@ class App extends React.Component {
     });
   }
 
+  onReset = () => {
+    console.log("Reset asked")
+    this.setState({
+      uploadedFiles: this.state.uploadedFiles.empty(),
+      pageList: this.state.pageList.empty(),
+      clickedFile: null,
+      clickedPage: null,
+      clickedId: null
+    });
+  }
+
   renderHeader = () => (
     <header className="App-header">
       <div>In progress</div>
@@ -75,7 +85,7 @@ class App extends React.Component {
     else {
       return (
         <div className="pageviz">
-          <div id="vCenter">
+          <div id="vCenter" style={{ margin: 'auto' }}>
             <Button callback={ this.onClickUp } img={ faArrowCircleUp }></Button>
             <Button callback={ this.onClickDown } img={ faArrowCircleDown }></Button>
           </div>
@@ -87,6 +97,9 @@ class App extends React.Component {
               </Page>
             </Document>
           </div>
+          <div id="vCenter" style={{ margin: 'auto' }}>
+            <Button callback={ () => { console.log('Trash not active for now'); } }img={ faTrash }></Button>
+          </div>
         </div>
       );
     }
@@ -96,14 +109,22 @@ class App extends React.Component {
     <div className="container">
       <div className="subcontainer">
         <div className="uploader">
-          <input
-            id="uploadArea"
-            type="file"
-            name="file"
-            accept='.pdf'
-            multiple
-            onChange={ this.onFileChange }
-          />
+          <button id="downloadButton">
+            <label>Download
+              <input
+                id="uploadButton"
+                type="file"
+                name="file"
+                accept='.pdf'
+                multiple
+                onChange={ this.onFileChange }
+              />
+            </label>
+          </button>
+          <button
+            id="resetButton"
+            onClick={ this.onReset }
+          >Reset</button>
             { this.state.uploadedFiles.getFiles().map((value, index) =>
                 <Queue
                   docId={ index }

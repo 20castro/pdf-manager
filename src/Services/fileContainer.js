@@ -35,6 +35,12 @@ class fileContainer {
         return this.pages;
     }
 
+    empty (){
+        this.container = [];
+        this.pages.empty();
+        return this;
+    }
+
     // Getters
 
     getFiles() {

@@ -43,6 +43,11 @@ class pageContainer {
         return grouped;
     }
 
+    empty (){
+        this.container = [];
+        return this;
+    }
+
     // Pages moves
 
     find (pid) {
