@@ -74,6 +74,12 @@ class pageContainer {
         return this;
     }
 
+    remove (pid) {
+        const loc = this.find(pid);
+        this.container.splice(loc, 1);
+        return this;
+    }
+
     // Getters
 
     getLength() {

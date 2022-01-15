@@ -4,7 +4,6 @@ class fileContainer {
 
     constructor() {
         this.container = [];
-        this.pages = new pageContainer();
     }
 
     append(newFiles) {
@@ -25,19 +24,18 @@ class fileContainer {
         return this;
     }
 
-    toPageContainer() {
+    toPageContainer(pages) {
         for (let [index, el] of this.container.entries()) {
             if (el.loaded && !(el.added)) {
-                this.pages.appendEntireFile(index, el.numberPages);
+                pages.appendEntireFile(index, el.numberPages);
                 this.container[index].added = true;
             }
         }
-        return this.pages;
+        return pages;
     }
 
     empty (){
         this.container = [];
-        this.pages.empty();
         return this;
     }
 

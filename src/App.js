@@ -37,7 +37,7 @@ class App extends React.Component {
     let newFiles = this.state.uploadedFiles.addPages(index, n);
     this.setState({
       uploadedFiles: newFiles,
-      pageList: newFiles.toPageContainer()
+      pageList: newFiles.toPageContainer(this.state.pageList)
     });
   }
 
@@ -72,6 +72,16 @@ class App extends React.Component {
     });
   }
 
+  onTrash = () => {
+    console.log("Trash asked")
+    this.setState({
+      pageList: this.state.pageList.remove(this.state.clickedId),
+      clickedFile: null,
+      clickedPage: null,
+      clickedId: null
+    });
+  }
+
   renderHeader = () => (
     <header className="App-header">
       <div>In progress</div>
@@ -80,7 +90,7 @@ class App extends React.Component {
 
   renderCentralPage = () => {
     if (this.state.clickedFile == null || this.state.clickedPage == null) {
-      return <div className="pageviz">PDF page</div>;
+      return <div className="pageviz"></div>;
     }
     else {
       return (
@@ -98,7 +108,7 @@ class App extends React.Component {
             </Document>
           </div>
           <div id="vCenter" style={{ margin: 'auto' }}>
-            <Button callback={ () => { console.log('Trash not active for now'); } }img={ faTrash }></Button>
+            <Button callback={ this.onTrash }img={ faTrash }></Button>
           </div>
         </div>
       );
@@ -125,15 +135,18 @@ class App extends React.Component {
             id="resetButton"
             onClick={ this.onReset }
           >Reset</button>
-            { this.state.uploadedFiles.getFiles().map((value, index) =>
-                <Queue
-                  docId={ index }
-                  fileFormat={ value }
-                  key={ `doc_${ index }` }
-                  callback={ this.addNumPages }
-                >
-                </Queue> 
-              )
+            { this.state.uploadedFiles.getFiles().map((value, index) => {
+                if (value.loaded){ return null; }
+                else {
+                  return (<Queue
+                    docId={ index }
+                    fileFormat={ value }
+                    key={ `doc_${ index }` }
+                    callback={ this.addNumPages }
+                  >
+                  </Queue> );
+                }
+              })
             }
         </div>
         <div className="scroller">
