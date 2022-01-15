@@ -96,8 +96,8 @@ class App extends React.Component {
       return (
         <div className="pageviz">
           <div id="vCenter" style={{ margin: 'auto' }}>
-            <Button callback={ this.onClickUp } img={ faArrowCircleUp }></Button>
-            <Button callback={ this.onClickDown } img={ faArrowCircleDown }></Button>
+            <Button callback={ this.onClickUp } img={ faArrowCircleUp } title={ "Go up" }></Button>
+            <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
           </div>
           <div id="vCenter">
             <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
@@ -108,7 +108,7 @@ class App extends React.Component {
             </Document>
           </div>
           <div id="vCenter" style={{ margin: 'auto' }}>
-            <Button callback={ this.onTrash }img={ faTrash }></Button>
+            <Button callback={ this.onTrash } img={ faTrash } title={ "Delete this page" }></Button>
           </div>
         </div>
       );
@@ -120,7 +120,7 @@ class App extends React.Component {
       <div className="subcontainer">
         <div className="uploader">
           <button id="downloadButton">
-            <label>Download
+            <label title="Add new file(s)">Download
               <input
                 id="uploadButton"
                 type="file"
@@ -132,6 +132,7 @@ class App extends React.Component {
             </label>
           </button>
           <button
+            title="Erase all"
             id="resetButton"
             onClick={ this.onReset }
           >Reset</button>
