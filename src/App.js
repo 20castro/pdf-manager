@@ -115,12 +115,35 @@ class App extends React.Component {
     }
   }
 
+  renderDownload = () => {
+    if (this.state.uploadedFiles.getFiles().length == 0){
+      return (
+        <button
+          id="downloadButton"
+          onClick={ () => { console.log("Nothing to download"); }}
+        >Download</button>
+      );
+    }
+    else {
+      return (
+        <button id="downloadButton" onClick={ () => { console.log("Download asked [test]"); }}>
+          <a 
+            href={ URL.createObjectURL(this.state.uploadedFiles.getFiles()[0].file) } 
+            download="merged.pdf"
+            id="downloadText"
+          >Download</a>
+          {/* Here's a test : download first file if it exists for now */}
+        </button>
+      );
+    }
+  }
+
   renderScrollbars = () => (
     <div className="container">
       <div className="subcontainer">
         <div className="uploader">
-          <button id="downloadButton">
-            <label title="Add new file(s)">Download
+          <button id="uploadContainerButton">
+            <label title="Add new file(s)">Upload
               <input
                 id="uploadButton"
                 type="file"
@@ -136,6 +159,8 @@ class App extends React.Component {
             id="resetButton"
             onClick={ this.onReset }
           >Reset</button>
+          { this.renderDownload() }
+          <div>
             { this.state.uploadedFiles.getFiles().map((value, index) => {
                 if (value.loaded){ return null; }
                 else {
@@ -149,6 +174,7 @@ class App extends React.Component {
                 }
               })
             }
+          </div>
         </div>
         <div className="scroller">
           { this.state.pageList.groupByFile().map((value, index) =>

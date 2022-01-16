@@ -2,7 +2,7 @@
 class pageContainer {
 
     constructor() {
-        this.container = []
+        this.container = [];
         this.cnt = 0;
     }
 
