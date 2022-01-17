@@ -86,8 +86,6 @@
   grid-row: 4;
 }
 
-#downloadText {
-  font-style: normal;
-  text-decoration: none;
-  color: black;
+#downloader {
+  display: none;
 }

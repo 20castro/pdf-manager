@@ -9,6 +9,8 @@ import Button from './Components/Button';
 import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
 
+import { PDFDocument } from 'pdf-lib';
+
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -23,6 +25,18 @@ class App extends React.Component {
       clickedPage: null,
       clickedId: null
     };
+  }
+
+  createPdf = async() => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([350, 400]);
+    page.moveTo(110, 200);
+    page.drawText('Hello World!');
+    const pdfBytes = await pdfDoc.save();
+    const docUrl = URL.createObjectURL(
+      new Blob([pdfBytes], { type: "application/pdf" })
+    );
+    return docUrl;
   }
 
   onFileChange = event => {
@@ -115,45 +129,46 @@ class App extends React.Component {
     }
   }
 
-  renderDownload = () => {
-    if (this.state.uploadedFiles.getFiles().length == 0){
-      return (
-        <button
-          id="downloadButton"
-          onClick={ () => { console.log("Nothing to download"); }}
-        >Download</button>
-      );
-    }
-    else {
-      return (
-        <button id="downloadButton" onClick={ () => { console.log("Download asked [test]"); }}>
-          <a 
-            href={ URL.createObjectURL(this.state.uploadedFiles.getFiles()[0].file) } 
-            download="merged.pdf"
-            id="downloadText"
-          >Download</a>
-          {/* Here's a test : download first file if it exists for now */}
-        </button>
-      );
-    }
-  }
+  renderDownload = () => (
+    <button
+      title="Download result"
+      id="downloadButton"
+      onClick={ () => {
+        if (this.state.uploadedFiles.getFiles().length == 0) {
+          console.log('Nothing to download');
+        }
+        else {
+          console.log('Donwload asked')
+          this.createPdf().then(url => {
+            let downloader = document.getElementById('downloader');
+            downloader.href = url;
+            downloader.click();
+          });
+        }
+      }}
+    >Download</button>
+  );
 
   renderScrollbars = () => (
     <div className="container">
       <div className="subcontainer">
         <div className="uploader">
-          <button id="uploadContainerButton">
-            <label title="Add new file(s)">Upload
-              <input
-                id="uploadButton"
-                type="file"
-                name="file"
-                accept='.pdf'
-                multiple
-                onChange={ this.onFileChange }
-              />
-            </label>
-          </button>
+          <input
+            id="uploadButton"
+            type="file"
+            name="file"
+            accept='.pdf'
+            multiple
+            onChange={ this.onFileChange }
+          />
+          <button 
+            id="uploadContainerButton"
+            title="Add new files"
+            onClick={ () => {
+              const uploader = document.getElementById("uploadButton")
+              uploader.click();
+            }}
+          >Upload</button>
           <button
             title="Erase all"
             id="resetButton"
@@ -207,9 +222,10 @@ class App extends React.Component {
       ", id : ",
       this.state.clickedId
     );
-    console.log("========================")
+    console.log("========================");
     return (
       <div className="App">
+        <a download="processed.pdf" id="downloader"></a>
         { this.renderHeader() }
         { this.renderScrollbars() }
       </div>
