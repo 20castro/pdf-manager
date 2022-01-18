@@ -3,14 +3,12 @@ import React from 'react';
 import { faArrowCircleUp, faArrowCircleDown, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 import Preview from './Components/Preview';
-import Queue from './Components/Queue';
 import Button from './Components/Button';
 
 import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
 
 import { PDFDocument } from 'pdf-lib';
-import fileToArrayBuffer from 'file-to-array-buffer';
 
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -45,19 +43,13 @@ class App extends React.Component {
     return docUrl;
   }
 
-  onFileChange = event => {
-    let newFiles = event.target.files;
+  onFileChange = async(event) => {
+    const newFiles = event.target.files;
     console.log("File event : " + newFiles.length + " added");
+    const files = await this.state.uploadedFiles.append(newFiles);
     this.setState({
-      uploadedFiles: this.state.uploadedFiles.append(newFiles)
-    });
-  }
-
-  addNumPages = (index, n) => {
-    let newFiles = this.state.uploadedFiles.addPages(index, n);
-    this.setState({
-      uploadedFiles: newFiles,
-      pageList: newFiles.toPageContainer(this.state.pageList)
+      uploadedFiles: files,
+      pageList: files.toPageContainer(this.state.pageList)
     });
   }
 
@@ -102,11 +94,19 @@ class App extends React.Component {
     });
   }
 
-  renderHeader = () => (
-    <header className="App-header">
-      <div>In progress</div>
-    </header>
-  )
+  onDownload = () => {
+    if (this.state.pageList.getLength() == 0) {
+      console.log('Nothing to download');
+    }
+    else {
+      console.log('Donwload asked')
+      this.createPdf().then(url => {
+        let downloader = document.getElementById('downloader');
+        downloader.href = url;
+        downloader.click();
+      });
+    }
+  }
 
   renderCentralPage = () => {
     if (this.state.clickedFile == null || this.state.clickedPage == null) {
@@ -135,86 +135,53 @@ class App extends React.Component {
     }
   }
 
-  renderDownload = () => (
-    <button
-      title="Download result"
-      id="downloadButton"
-      onClick={ () => {
-        if (this.state.pageList.getLength() == 0) {
-          console.log('Nothing to download');
-        }
-        else {
-          console.log('Donwload asked')
-          this.createPdf().then(url => {
-            let downloader = document.getElementById('downloader');
-            downloader.href = url;
-            downloader.click();
-          });
-        }
-      }}
-    >Download</button>
+  renderUploader = () => (
+    <div className="uploader">
+      <input
+        id="uploadButton"
+        type="file"
+        name="file"
+        accept='.pdf'
+        multiple
+        onChange={ this.onFileChange }
+      />
+      <button 
+        id="uploadContainerButton"
+        title="Add new files"
+        onClick={ () => {
+          const uploader = document.getElementById("uploadButton")
+          uploader.click();
+        }}
+      >Upload</button>
+      <button
+        title="Erase all"
+        id="resetButton"
+        onClick={ this.onReset }
+      >Reset</button>
+      <button
+        title="Download result"
+        id="downloadButton"
+        onClick={ this.onDownload }
+      >Download</button>
+    </div>
   );
 
-  renderScrollbars = () => (
-    <div className="container">
-      <div className="subcontainer">
-        <div className="uploader">
-          <input
-            id="uploadButton"
-            type="file"
-            name="file"
-            accept='.pdf'
-            multiple
-            onChange={ this.onFileChange }
-          />
-          <button 
-            id="uploadContainerButton"
-            title="Add new files"
-            onClick={ () => {
-              const uploader = document.getElementById("uploadButton")
-              uploader.click();
-            }}
-          >Upload</button>
-          <button
-            title="Erase all"
-            id="resetButton"
-            onClick={ this.onReset }
-          >Reset</button>
-          { this.renderDownload() }
-          <div>
-            { this.state.uploadedFiles.getFiles().map((value, index) => {
-                if (value.loaded){ return null; }
-                else {
-                  return (<Queue
-                    docId={ index }
-                    fileFormat={ value }
-                    key={ `doc_${ index }` }
-                    callback={ this.addNumPages }
-                  >
-                  </Queue> );
-                }
-              })
-            }
-          </div>
-        </div>
-        <div className="scroller">
-          { this.state.pageList.groupByFile().map((value, index) =>
-              <Preview
-                value={ value }
-                file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
-                clicked={ this.state.clickedId }
-                index={ index }
-                key={ `doc_${ index }` }
-                callback={ this.onClickPage }
-              >
-              </Preview>
-            )
-          }
-        </div>
-      </div>
-      { this.renderCentralPage() }
+  renderScroller = () => (      
+    <div className="scroller">
+      { this.state.pageList.groupByFile().map((value, index) =>
+          <Preview
+            value={ value }
+            file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
+            clicked={ this.state.clickedId }
+            index={ index }
+            key={ `doc_${ index }` }
+            callback={ this.onClickPage }
+          >
+          </Preview>
+        )
+      }
     </div>
-  )
+  );
 
   render() {
     console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
@@ -231,9 +198,18 @@ class App extends React.Component {
     console.log("========================");
     return (
       <div className="App">
+        <header className="App-header">
+          <div>In progress</div>
+        </header>
         <a download="result.pdf" id="downloader"></a>
-        { this.renderHeader() }
-        { this.renderScrollbars() }
+        <div className="container">
+          <div className="subcontainer">
+            { this.renderUploader() }
+            { this.renderScroller() }
+          </div>
+          { this.renderCentralPage() }
+        </div>
+        
       </div>
     );
   }

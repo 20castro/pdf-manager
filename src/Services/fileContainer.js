@@ -1,3 +1,4 @@
+import { PDFDocument } from "pdf-lib";
 
 class fileContainer {
 
@@ -5,27 +6,23 @@ class fileContainer {
         this.container = [];
     }
 
-    append(newFiles) {
+    async append(newFiles) {
         let newList = Object.values(newFiles);
         for (let fileData of newList) {
+            const buffer = await fileData.arrayBuffer();
+            const doc = await PDFDocument.load(buffer)
             this.container.push({
                 file: fileData,
-                loaded: false,
+                numberPages: doc.getPageCount(),
                 added: false
             })
         }
         return this;
     }
 
-    addPages(index, n) {
-        this.container[index]['numberPages'] = n;
-        this.container[index].loaded = true;
-        return this;
-    }
-
     toPageContainer(pages) {
         for (let [index, el] of this.container.entries()) {
-            if (el.loaded && !(el.added)) {
+            if (!(el.added)) {
                 pages.appendEntireFile(index, el.numberPages);
                 this.container[index].added = true;
             }
