@@ -44,8 +44,32 @@ class pageContainer {
         return grouped;
     }
 
+    arrayByFile (){
+        if (this.getLength() == 0) { return []; }
+        let lastId = null;
+        let grouped = [];
+        let current = [];
+        for (const el of this.container) {
+            if (lastId != null && lastId != el.fileId) {
+                grouped.push({
+                    fileId: lastId,
+                    pages: current.slice()
+                });
+                current = [];
+            }
+            current.push(el.page - 1); // pdf-lib numbering starts with 0
+            lastId = el.fileId;
+        }
+        grouped.push({
+            fileId: lastId,
+            pages: current.slice()
+        });
+        return grouped;
+    }
+
     empty (){
         this.container = [];
+        this.cnt = 0;
         return this;
     }
 

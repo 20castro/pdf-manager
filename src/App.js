@@ -10,6 +10,7 @@ import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
 
 import { PDFDocument } from 'pdf-lib';
+import fileToArrayBuffer from 'file-to-array-buffer';
 
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -28,11 +29,16 @@ class App extends React.Component {
   }
 
   createPdf = async() => {
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([350, 400]);
-    page.moveTo(110, 200);
-    page.drawText('Hello World!');
-    const pdfBytes = await pdfDoc.save();
+    const byFile = this.state.pageList.arrayByFile();
+    let doc = await PDFDocument.create();
+    for (const el of byFile) {
+        const input = this.state.uploadedFiles.getFiles()[el.fileId].file;
+        const data = await input.arrayBuffer();
+        const file = await PDFDocument.load(data);
+        const copy = await doc.copyPages(file, el.pages);
+        copy.forEach(page => doc.addPage(page));
+    }
+    const pdfBytes = await doc.save();
     const docUrl = URL.createObjectURL(
       new Blob([pdfBytes], { type: "application/pdf" })
     );
@@ -134,7 +140,7 @@ class App extends React.Component {
       title="Download result"
       id="downloadButton"
       onClick={ () => {
-        if (this.state.uploadedFiles.getFiles().length == 0) {
+        if (this.state.pageList.getLength() == 0) {
           console.log('Nothing to download');
         }
         else {
@@ -225,7 +231,7 @@ class App extends React.Component {
     console.log("========================");
     return (
       <div className="App">
-        <a download="processed.pdf" id="downloader"></a>
+        <a download="result.pdf" id="downloader"></a>
         { this.renderHeader() }
         { this.renderScrollbars() }
       </div>
