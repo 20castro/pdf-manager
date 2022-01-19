@@ -8,40 +8,33 @@ class Preview extends React.Component {
     constructor(props) {
       super(props);
     }
-  
-    renderPages = () => {
-      let items = [];
-      for (let p of this.props.value.pages){
-        let name = "unclicked";
-        if (p.id == this.props.clicked) {
-          name = "clicked";
-        }
-        items.push(
-          <div id="page" key={`id_${ p.id }`}>
-            <Page
-              pageNumber={ p.num }
-              className={ name }
-              width={ 200 }
-              onClick={ () => {
-                this.props.callback(this.props.value.fileId, p.num, p.id);
-              }}
-            />
-          </div>
-        );
-      }
-      return items;
-    }
     
     render() {
       return (
-        <div>
-          <Document
-            file={ this.props.file }
-            onLoadError={ () => { console.log("Failed to load"); } }
-          >
-            { this.renderPages() }
-          </Document>
-        </div>
+        <Document
+          file={ this.props.file }
+          onLoadError={ () => { console.log("Failed to load"); } }
+        >
+          { this.props.value.pages.map((p, index) => {
+              let name = "unclicked";
+              if (p.id == this.props.clicked) {
+                name = "clicked";
+              }
+              return (
+                <div id="page" key={`id_${ p.id }`}>
+                  <Page
+                    pageNumber={ p.num }
+                    className={ name }
+                    width={ 200 }
+                    onClick={ () => {
+                      this.props.callback(this.props.value.fileId, p.num, p.id);
+                    }}
+                  />
+                </div>
+              );
+            })
+          }
+        </Document>
       );
     }
   }

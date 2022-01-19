@@ -37,8 +37,13 @@ class fileContainer {
 
     // Getters
 
-    getFiles() {
-        return this.container;
+    getFiles(index = null) {
+        if (index == null){ return this.container; }
+        else { return this.container[index]; }
+    }
+
+    getLength() {
+        return this.container.length;
     }
 }
 

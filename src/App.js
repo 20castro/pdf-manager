@@ -4,6 +4,7 @@ import { faArrowCircleUp, faArrowCircleDown, faTrash } from '@fortawesome/free-s
 
 import Preview from './Components/Preview';
 import Button from './Components/Button';
+import Board from './Components/Board';
 
 import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
@@ -30,7 +31,7 @@ class App extends React.Component {
     const byFile = this.state.pageList.arrayByFile();
     let doc = await PDFDocument.create();
     for (const el of byFile) {
-        const input = this.state.uploadedFiles.getFiles()[el.fileId].file;
+        const input = this.state.uploadedFiles.getFiles(el.fileId).file;
         const data = await input.arrayBuffer();
         const file = await PDFDocument.load(data);
         const copy = await doc.copyPages(file, el.pages);
@@ -43,7 +44,9 @@ class App extends React.Component {
     return docUrl;
   }
 
-  onFileChange = async(event) => {
+  // Board buttons
+
+  onUpload = async(event) => {
     const newFiles = event.target.files;
     console.log("File event : " + newFiles.length + " added");
     const files = await this.state.uploadedFiles.append(newFiles);
@@ -52,6 +55,33 @@ class App extends React.Component {
       pageList: files.toPageContainer(this.state.pageList)
     });
   }
+
+  onReset = () => {
+    console.log("Reset asked")
+    this.setState({
+      uploadedFiles: this.state.uploadedFiles.empty(),
+      pageList: this.state.pageList.empty(),
+      clickedFile: null,
+      clickedPage: null,
+      clickedId: null
+    });
+  }
+
+  onDownload = () => {
+    if (this.state.pageList.getLength() == 0) {
+      console.log('Nothing to download');
+    }
+    else {
+      console.log('Donwload asked')
+      this.createPdf().then(url => {
+        let downloader = document.getElementById('downloader');
+        downloader.href = url;
+        downloader.click();
+      });
+    }
+  }
+
+  // Center page buttons
 
   onClickPage = (n, k, id) => {
     this.setState({
@@ -73,17 +103,6 @@ class App extends React.Component {
     });
   }
 
-  onReset = () => {
-    console.log("Reset asked")
-    this.setState({
-      uploadedFiles: this.state.uploadedFiles.empty(),
-      pageList: this.state.pageList.empty(),
-      clickedFile: null,
-      clickedPage: null,
-      clickedId: null
-    });
-  }
-
   onTrash = () => {
     console.log("Trash asked")
     this.setState({
@@ -94,21 +113,9 @@ class App extends React.Component {
     });
   }
 
-  onDownload = () => {
-    if (this.state.pageList.getLength() == 0) {
-      console.log('Nothing to download');
-    }
-    else {
-      console.log('Donwload asked')
-      this.createPdf().then(url => {
-        let downloader = document.getElementById('downloader');
-        downloader.href = url;
-        downloader.click();
-      });
-    }
-  }
+  // Render
 
-  renderCentralPage = () => {
+  centerPage = () => {
     if (this.state.clickedFile == null || this.state.clickedPage == null) {
       return <div className="pageviz"></div>;
     }
@@ -120,10 +127,12 @@ class App extends React.Component {
             <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
           </div>
           <div id="vCenter">
-            <Document file={ this.state.uploadedFiles.getFiles()[this.state.clickedFile].file }>
+            <Document file={ this.state.uploadedFiles.getFiles(this.state.clickedFile).file }>
               <Page
                 pageNumber={ this.state.clickedPage }
-                width={ 300 }>
+                width={ 500 }
+                // className={ "centerPage" }
+              > 
               </Page>
             </Document>
           </div>
@@ -135,56 +144,8 @@ class App extends React.Component {
     }
   }
 
-  renderUploader = () => (
-    <div className="uploader">
-      <input
-        id="uploadButton"
-        type="file"
-        name="file"
-        accept='.pdf'
-        multiple
-        onChange={ this.onFileChange }
-      />
-      <button 
-        id="uploadContainerButton"
-        title="Add new files"
-        onClick={ () => {
-          const uploader = document.getElementById("uploadButton")
-          uploader.click();
-        }}
-      >Upload</button>
-      <button
-        title="Erase all"
-        id="resetButton"
-        onClick={ this.onReset }
-      >Reset</button>
-      <button
-        title="Download result"
-        id="downloadButton"
-        onClick={ this.onDownload }
-      >Download</button>
-    </div>
-  );
-
-  renderScroller = () => (      
-    <div className="scroller">
-      { this.state.pageList.groupByFile().map((value, index) =>
-          <Preview
-            value={ value }
-            file={ this.state.uploadedFiles.getFiles()[value.fileId].file }
-            clicked={ this.state.clickedId }
-            index={ index }
-            key={ `doc_${ index }` }
-            callback={ this.onClickPage }
-          >
-          </Preview>
-        )
-      }
-    </div>
-  );
-
   render() {
-    console.log("Uploaded ", this.state.uploadedFiles.getFiles().length, " files in total");
+    console.log("Uploaded ", this.state.uploadedFiles.getLength(), " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
     console.log(
@@ -204,12 +165,23 @@ class App extends React.Component {
         <a download="result.pdf" id="downloader"></a>
         <div className="container">
           <div className="subcontainer">
-            { this.renderUploader() }
-            { this.renderScroller() }
+            <Board onUpload={ this.onUpload } onReset={ this.onReset } onDownload={ this.onDownload }></Board>
+            <div className="scroller">
+              { this.state.pageList.groupByFile().map((value, index) =>
+                  <Preview
+                    value={ value }
+                    file={ this.state.uploadedFiles.getFiles(value.fileId).file }
+                    clicked={ this.state.clickedId }
+                    index={ index }
+                    key={ `doc_${ index }` }
+                    callback={ this.onClickPage }
+                  ></Preview>
+                )
+              }
+            </div>
           </div>
-          { this.renderCentralPage() }
+          { this.centerPage() }
         </div>
-        
       </div>
     );
   }

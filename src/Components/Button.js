@@ -8,7 +8,6 @@ class Button extends React.Component {
         super(props);
     }
 
-    // App state already has clickedId and information up or down through the nature of callback given
     render() {
         return (
             <div title={ this.props.title }>
