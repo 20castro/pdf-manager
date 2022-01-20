@@ -21,8 +21,6 @@ class App extends React.Component {
     this.state = {
       uploadedFiles: new fileContainer(),
       pageList: new pageContainer(),
-      clickedFile: null,
-      clickedPage: null,
       clickedId: null
     };
   }
@@ -35,7 +33,18 @@ class App extends React.Component {
         const data = await input.arrayBuffer();
         const file = await PDFDocument.load(data);
         const copy = await doc.copyPages(file, el.pages);
-        copy.forEach(page => doc.addPage(page));
+        copy.forEach(page => {
+          const { width, height } = page.getSize();
+          if (height > width) {
+            const alpha = 595.276/width;
+            page.scale(alpha, alpha);
+          }
+          else {
+            const alpha = 595.276/height;
+            page.scale(alpha, alpha);
+          }
+          return doc.addPage(page);
+        });
     }
     const pdfBytes = await doc.save();
     const docUrl = URL.createObjectURL(
@@ -61,8 +70,6 @@ class App extends React.Component {
     this.setState({
       uploadedFiles: this.state.uploadedFiles.empty(),
       pageList: this.state.pageList.empty(),
-      clickedFile: null,
-      clickedPage: null,
       clickedId: null
     });
   }
@@ -83,10 +90,8 @@ class App extends React.Component {
 
   // Center page buttons
 
-  onClickPage = (n, k, id) => {
+  onClickPage = (id) => {
     this.setState({
-      clickedFile: n,
-      clickedPage: k,
       clickedId: id
     });
   }
@@ -107,16 +112,15 @@ class App extends React.Component {
     console.log("Trash asked")
     this.setState({
       pageList: this.state.pageList.remove(this.state.clickedId),
-      clickedFile: null,
-      clickedPage: null,
-      clickedId: null
+      clickedId: this.state.clickedId + 1
     });
   }
 
   // Render
 
   centerPage = () => {
-    if (this.state.clickedFile == null || this.state.clickedPage == null) {
+    const clickedPage = this.state.pageList.getById(this.state.clickedId);
+    if (this.state.clickedId == null || clickedPage == null) {
       return <div className="pageviz"></div>;
     }
     else {
@@ -127,10 +131,10 @@ class App extends React.Component {
             <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
           </div>
           <div id="vCenter">
-            <Document file={ this.state.uploadedFiles.getFiles(this.state.clickedFile).file }>
+            <Document file={ this.state.uploadedFiles.getFiles(clickedPage.fileId).file }>
               <Page
-                pageNumber={ this.state.clickedPage }
-                width={ 500 }
+                pageNumber={ clickedPage.page }
+                width={ 300 }
                 // className={ "centerPage" }
               > 
               </Page>
@@ -148,14 +152,7 @@ class App extends React.Component {
     console.log("Uploaded ", this.state.uploadedFiles.getLength(), " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
-    console.log(
-      "Clicked page ",
-      this.state.clickedPage,
-      " from file ",
-      this.state.clickedFile,
-      ", id : ",
-      this.state.clickedId
-    );
+    console.log("Clicked page ", this.state.clickedId);
     console.log("========================");
     return (
       <div className="App">

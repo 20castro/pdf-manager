@@ -107,6 +107,13 @@ class pageContainer {
 
     // Getters
 
+    getById(pid) {
+        for (const value of this.container) {
+            if (value.pageId == pid){ return value; }
+        }
+        return null;
+    }
+
     getLength() {
         return this.container.length;
     }

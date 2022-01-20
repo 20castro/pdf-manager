@@ -27,7 +27,7 @@ class Preview extends React.Component {
                     className={ name }
                     width={ 200 }
                     onClick={ () => {
-                      this.props.callback(this.props.value.fileId, p.num, p.id);
+                      this.props.callback(p.id);
                     }}
                   />
                 </div>
