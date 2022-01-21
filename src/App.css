@@ -63,3 +63,19 @@
 #downloader {
   display: none;
 }
+
+#centerLoader {
+  height: 50px;
+  background-color: #e6eeff;
+  padding: 10px;
+  animation-name:rotate;
+  animation-duration: 2.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate {
+  100% {
+    transform:rotate(360deg);
+  }
+}

@@ -1,6 +1,8 @@
 import React from 'react';
 import './Preview.css'
 import { Document, Page, pdfjs } from 'react-pdf';
+import image from '../media/loader.png'
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 class Preview extends React.Component {
@@ -13,6 +15,7 @@ class Preview extends React.Component {
       return (
         <Document
           file={ this.props.file }
+          loading={ () => <img src={ image } id="loader"></img> }
           onLoadError={ () => { console.log("Failed to load"); } }
         >
           { this.props.value.pages.map((p, index) => {

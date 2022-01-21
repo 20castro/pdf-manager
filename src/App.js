@@ -10,6 +10,7 @@ import fileContainer from './Services/fileContainer';
 import pageContainer from './Services/pageContainer';
 
 import { PDFDocument } from 'pdf-lib';
+import image from './media/loader.png'
 
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -21,7 +22,9 @@ class App extends React.Component {
     this.state = {
       uploadedFiles: new fileContainer(),
       pageList: new pageContainer(),
-      clickedId: null
+      clickedId: null,
+      // windowH: window.innerHeight,
+      // windowW: window.innerWidth
     };
   }
 
@@ -131,10 +134,13 @@ class App extends React.Component {
             <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
           </div>
           <div id="vCenter">
-            <Document file={ this.state.uploadedFiles.getFiles(clickedPage.fileId).file }>
+            <Document
+              file={ this.state.uploadedFiles.getFiles(clickedPage.fileId).file }
+              loading={ () => <img src={ image } id="centerLoader"></img> }
+            >
               <Page
                 pageNumber={ clickedPage.page }
-                width={ 300 }
+                width={ .45*window.innerHeight }
                 // className={ "centerPage" }
               > 
               </Page>
@@ -149,10 +155,17 @@ class App extends React.Component {
   }
 
   render() {
+    // window.addEventListener('resize', () => {
+    //   this.setState({
+    //     windowH: window.innerHeight,
+    //     windowW: window.innerWidth
+    //   });
+    // });
     console.log("Uploaded ", this.state.uploadedFiles.getLength(), " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
     console.log("Clicked page ", this.state.clickedId);
+    // console.log("Height : ", this.state.windowH, " - Width : ", this.state.windowW);
     console.log("========================");
     return (
       <div className="App">
