@@ -11,9 +11,12 @@ class fileContainer {
         for (let fileData of newList) {
             const buffer = await fileData.arrayBuffer();
             const doc = await PDFDocument.load(buffer)
+            const dim = [];
+            for (const p of doc.getPages()){ dim.push(p.getSize()); }
             this.container.push({
                 file: fileData,
                 numberPages: doc.getPageCount(),
+                dimPages: dim,
                 added: false
             })
         }
@@ -23,7 +26,7 @@ class fileContainer {
     toPageContainer(pages) {
         for (let [index, el] of this.container.entries()) {
             if (!(el.added)) {
-                pages.appendEntireFile(index, el.numberPages);
+                pages.appendEntireFile(index, el.numberPages, el.dimPages);
                 this.container[index].added = true;
             }
         }

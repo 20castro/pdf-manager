@@ -1,29 +1,36 @@
 .board {
-    border: dashed 1px black;
-    border-radius: 10%;
-    width: 100%;
-    height: 50px;
-    display: grid;
-    justify-content: center;
-    grid-template-columns: 15% 40% 2% 28% 15%;
-    grid-template-rows: repeat(5, 1fr);
+  background-color: #fff9e6;
+  border-radius: 10%;
+  width: 100%;
+  height: 10%;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 5% 30% 5% 30% 5% 20% 5%;
+  grid-template-rows: 20% 60% 20%;
+}
+
+.board > * {
+  font-size: min(2vh, calc(1px + .8vw));
 }
   
 #uploader {
-    display: none;
+  display: none;
 }
 
 #uploadButton {
-    grid-column: 2;
-    grid-row: 2;
+  border-radius: 10%;
+  grid-column: 2;
+  grid-row: 2;
 }
 
 #resetButton {
-  grid-column: 4;
+  border-radius: 10%;
+  grid-column: 6;
   grid-row: 2;
 }
 
 #downloadButton {
-  grid-column: 2 / 5;
-  grid-row: 4;
+  border-radius: 10%;
+  grid-column: 4;
+  grid-row: 2;
 }

@@ -27,15 +27,15 @@ class Board extends React.Component {
                 }}
               >Upload</button>
               <button
-                title="Erase all"
-                id="resetButton"
-                onClick={ this.props.onReset }
-              >Reset</button>
-              <button
                 title="Download result"
                 id="downloadButton"
                 onClick={ this.props.onDownload }
               >Download</button>
+              <button
+                title="Erase all"
+                id="resetButton"
+                onClick={ this.props.onReset }
+              >Reset</button>
             </div>
         );
     }

@@ -27,8 +27,9 @@ class Preview extends React.Component {
                 <div id="page" key={`id_${ p.id }`}>
                   <Page
                     pageNumber={ p.num }
+                    width={ this.props.width }
                     className={ name }
-                    width={ 200 }
+                    renderMode='svg'
                     onClick={ () => {
                       this.props.callback(p.id);
                     }}

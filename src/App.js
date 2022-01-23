@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
-import { faArrowCircleUp, faArrowCircleDown, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faArrowCircleUp, faArrowCircleDown, faTrash, faFile } from '@fortawesome/free-solid-svg-icons'
+import { SizeMe } from 'react-sizeme';
 
 import Preview from './Components/Preview';
 import Button from './Components/Button';
@@ -13,6 +14,7 @@ import { PDFDocument } from 'pdf-lib';
 import image from './media/loader.png'
 
 import { Document, Page, pdfjs } from 'react-pdf';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 class App extends React.Component {
@@ -22,9 +24,7 @@ class App extends React.Component {
     this.state = {
       uploadedFiles: new fileContainer(),
       pageList: new pageContainer(),
-      clickedId: null,
-      // windowH: window.innerHeight,
-      // windowW: window.innerWidth
+      clickedId: null
     };
   }
 
@@ -127,27 +127,53 @@ class App extends React.Component {
       return <div className="pageviz"></div>;
     }
     else {
+      const ratio = clickedPage.ratio;
       return (
         <div className="pageviz">
-          <div id="vCenter" style={{ margin: 'auto' }}>
-            <Button callback={ this.onClickUp } img={ faArrowCircleUp } title={ "Go up" }></Button>
-            <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
+          <div id="hCenter">
+            <div id="vCenter">
+              <Button callback={ this.onClickUp } img={ faArrowCircleUp } title={ "Go up" }></Button>
+              <Button callback={ this.onClickDown } img={ faArrowCircleDown } title={ "Go down" }></Button>
+            </div>
           </div>
-          <div id="vCenter">
-            <Document
-              file={ this.state.uploadedFiles.getFiles(clickedPage.fileId).file }
-              loading={ () => <img src={ image } id="centerLoader"></img> }
-            >
-              <Page
-                pageNumber={ clickedPage.page }
-                width={ .45*window.innerHeight }
-                // className={ "centerPage" }
-              > 
-              </Page>
-            </Document>
-          </div>
-          <div id="vCenter" style={{ margin: 'auto' }}>
-            <Button callback={ this.onTrash } img={ faTrash } title={ "Delete this page" }></Button>
+          <SizeMe monitorHeight refreshRate={ 128 }>
+            { ({ size }) => {
+              const containerRatio = size.height/size.width;
+              let actualPage;
+              if (ratio > containerRatio) {
+                actualPage = (
+                  <Page
+                    pageNumber={ clickedPage.page }
+                    height={ .96*size.height }
+                    renderMode='svg'
+                  ></Page>
+                );
+              }
+              else {
+                actualPage = (
+                  <Page
+                    pageNumber={ clickedPage.page }
+                    width={ .96*size.width }
+                    renderMode='svg'
+                  ></Page>
+                );
+              }
+              return (
+                <div id="vCenter">
+                  <div id="hCenter">
+                    <Document
+                      file={ this.state.uploadedFiles.getFiles(clickedPage.fileId).file }
+                      loading={ () => <img src={ image } id="centerLoader"></img> }
+                    >{ actualPage }</Document>
+                  </div>
+                </div>
+              );
+            }}
+          </SizeMe>
+          <div id="hCenter">
+            <div id="vCenter">
+              <Button callback={ this.onTrash } img={ faTrash } title={ "Delete this page" }></Button>
+            </div>
           </div>
         </div>
       );
@@ -155,39 +181,43 @@ class App extends React.Component {
   }
 
   render() {
-    // window.addEventListener('resize', () => {
-    //   this.setState({
-    //     windowH: window.innerHeight,
-    //     windowW: window.innerWidth
-    //   });
-    // });
     console.log("Uploaded ", this.state.uploadedFiles.getLength(), " files in total");
     console.log("Files : ", this.state.uploadedFiles.getFiles());
     console.log("Total number of pages : ", this.state.pageList.getLength());
     console.log("Clicked page ", this.state.clickedId);
-    // console.log("Height : ", this.state.windowH, " - Width : ", this.state.windowW);
     console.log("========================");
     return (
       <div className="App">
         <header className="App-header">
-          <div>In progress</div>
+          <div id="right-header">
+            <FontAwesomeIcon icon={ faFile }></FontAwesomeIcon>
+          </div>
+          <div
+            title='Merge, split and re-organize your PDF files'
+            id='center-header'
+            >PDF Manager
+          </div>
         </header>
         <a download="result.pdf" id="downloader"></a>
         <div className="container">
           <div className="subcontainer">
             <Board onUpload={ this.onUpload } onReset={ this.onReset } onDownload={ this.onDownload }></Board>
             <div className="scroller">
-              { this.state.pageList.groupByFile().map((value, index) =>
-                  <Preview
-                    value={ value }
-                    file={ this.state.uploadedFiles.getFiles(value.fileId).file }
-                    clicked={ this.state.clickedId }
-                    index={ index }
-                    key={ `doc_${ index }` }
-                    callback={ this.onClickPage }
-                  ></Preview>
-                )
-              }
+              <SizeMe refreshRate={ 64 }>
+                {({ size }) =>
+                  this.state.pageList.groupByFile().map((value, index) =>
+                    <Preview
+                      value={ value }
+                      file={ this.state.uploadedFiles.getFiles(value.fileId).file }
+                      clicked={ this.state.clickedId }
+                      index={ index }
+                      key={ `doc_${ index }` }
+                      width={ .9*size.width }
+                      callback={ this.onClickPage }
+                    ></Preview>
+                  )
+                }
+              </SizeMe>
             </div>
           </div>
           { this.centerPage() }

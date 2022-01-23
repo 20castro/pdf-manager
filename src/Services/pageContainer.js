@@ -6,13 +6,13 @@ class pageContainer {
         this.cnt = 0;
     }
 
-    appendEntireFile(index, n) {
-        console.log("Adding file ", index)
+    appendEntireFile(index, n, dimPages) {
         for (let k = 0; k < n; k++) {
             this.container.push({
                 fileId: index,
                 pageId: this.cnt,
-                page: k + 1
+                page: k + 1,
+                ratio: dimPages[k].height/dimPages[k].width
             });
             this.cnt++;
         }
