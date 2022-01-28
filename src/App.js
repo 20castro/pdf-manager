@@ -38,14 +38,8 @@ class App extends React.Component {
         const copy = await doc.copyPages(file, el.pages);
         copy.forEach(page => {
           const { width, height } = page.getSize();
-          if (height > width) {
-            const alpha = 595.276/width;
-            page.scale(alpha, alpha);
-          }
-          else {
-            const alpha = 595.276/height;
-            page.scale(alpha, alpha);
-          }
+          const alpha = height > width ? 595.276/width : 841.890/width;
+          page.scale(alpha, alpha);
           return doc.addPage(page);
         });
     }
